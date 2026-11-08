@@ -1,3 +1,17 @@
+# SplitSeat
+
+SplitSeat is an audited fork of [Couchlink](https://github.com/cranebeaker/couchlink) (MIT): split-screen co-op on one
+PC, one copy of the game per player. The only differences are on the `svarus` branch:
+
+- the game catalog, live recipes and self-update stay off unless you set an environment variable for each
+  (`COUCHLINK_CATALOG_URL`, `COUCHLINK_RECIPES_URL` + `COUCHLINK_RECIPES_PUBKEY`, `COUCHLINK_RELEASES_URL`);
+- live recipes have no built-in signing key, so nobody else can push recipes to your PC;
+- [AUDIT.md](AUDIT.md) lists what was reviewed, what was changed and what was not covered.
+
+Build it yourself from source (below); this repo publishes no binaries. Upstream's README follows unchanged.
+
+---
+
 <p align="center">
   <img src="assets/brand/couchlink-lockup-on-dark.png" alt="Couchlink" width="420">
 </p>
