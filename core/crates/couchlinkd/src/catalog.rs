@@ -7,8 +7,9 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::time::{Duration, SystemTime};
 
-pub const DEFAULT_RECOMPS_URL: &str = "https://coopanything.app/data/recomps.js";
-pub const DEFAULT_STATS_URL: &str = "https://coopanything.app/api/stats";
+// svarus fork: no catalog by default, so Couchlink talks to no outside site. Set COUCHLINK_CATALOG_URL to turn it on.
+pub const DEFAULT_RECOMPS_URL: &str = "";
+pub const DEFAULT_STATS_URL: &str = "";
 /// A cache older than this is refreshed in the background.
 pub const MAX_AGE: Duration = Duration::from_secs(6 * 60 * 60);
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
@@ -28,6 +29,11 @@ impl Urls {
             _ => default.to_string(),
         };
         Urls { recomps: get("COUCHLINK_CATALOG_URL", DEFAULT_RECOMPS_URL), stats: get("COUCHLINK_STATS_URL", DEFAULT_STATS_URL) }
+    }
+
+    /// False when no catalog address is set: then neither the catalog nor live recipes are fetched.
+    pub fn enabled(&self) -> bool {
+        !self.recomps.is_empty()
     }
 }
 

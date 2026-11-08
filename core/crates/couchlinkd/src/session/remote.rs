@@ -8,8 +8,10 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 /// Public half of the recipe signing key. The private half never leaves the owner's PC (or a CI secret).
-pub const PUBLIC_KEY: &str = "ffe01f75fc98793598bf9c8d271b625dfd0895d1453c20931321bfbb27326cc9";
-pub const DEFAULT_URL: &str = "https://coopanything.app/couchlink/recipes/";
+/// svarus fork: no built-in key and no built-in address, so no outside party can push recipes (a recipe can download
+/// and start programs). Live recipes need both COUCHLINK_RECIPES_URL and COUCHLINK_RECIPES_PUBKEY (your own key).
+pub const PUBLIC_KEY: &str = "";
+pub const DEFAULT_URL: &str = "";
 /// How often the hub refreshes while it runs.
 pub const PERIOD: Duration = Duration::from_secs(6 * 60 * 60);
 
@@ -56,6 +58,9 @@ fn write_atomic(path: &Path, bytes: &[u8]) -> Result<(), String> {
 
 /// Bring the cache up to date. Returns a one-line summary for the log.
 pub async fn refresh(state_dir: &Path, source: &Source) -> Result<String, String> {
+    if source.base_url.trim_end_matches('/').is_empty() {
+        return Ok("live recipes are off".to_string());
+    }
     let key = couchlink_sign::parse_public_key(&source.public_key)?;
     let client = reqwest::Client::builder().timeout(Duration::from_secs(30)).build().map_err(|e| e.to_string())?;
     let index_bytes = get(&client, &format!("{}{INDEX_FILE}", source.base_url)).await?;

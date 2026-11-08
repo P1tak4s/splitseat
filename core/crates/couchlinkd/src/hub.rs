@@ -1134,7 +1134,7 @@ player {}: {}", s.seat + 1, s.error.as_deref().unwrap_or_default());
 
     /// Fetch the catalog in the background unless a fetch is already running.
     fn start_fetch(&mut self) {
-        if self.fetching {
+        if self.fetching || !self.urls.enabled() {
             return;
         }
         self.fetching = true;

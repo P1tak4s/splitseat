@@ -7,7 +7,6 @@
 use serde_json::Value;
 use std::path::{Path, PathBuf};
 
-pub const RELEASES_URL: &str = "https://api.github.com/repos/cranebeaker/couchlink/releases";
 /// The command line that makes couchlinkd the updater: `--apply-update <new files> <install folder> <app> <pid>...`.
 pub const APPLY_ARG: &str = "--apply-update";
 
@@ -69,8 +68,10 @@ pub fn pick(releases: &Value, current: &str) -> Option<Available> {
 }
 
 /// Ask GitHub. Blocking.
+/// svarus fork: off unless COUCHLINK_RELEASES_URL names a releases API you trust (we build from source instead).
 pub fn check() -> Result<Option<Available>, String> {
-    let bytes = couchlink_steam::fetch::get(RELEASES_URL).map_err(|e| format!("cannot reach GitHub: {}", e.user_message()))?;
+    let Ok(url) = std::env::var("COUCHLINK_RELEASES_URL") else { return Ok(None) };
+    let bytes = couchlink_steam::fetch::get(&url).map_err(|e| format!("cannot reach GitHub: {}", e.user_message()))?;
     let releases: Value = serde_json::from_slice(&bytes).map_err(|e| format!("GitHub's answer could not be read: {e}"))?;
     Ok(pick(&releases, current()))
 }
